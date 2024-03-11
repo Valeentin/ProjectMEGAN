@@ -120,7 +120,10 @@ void loop() {
 
       samplesRead++;
 
-      if (samplesRead == numSamples) {
+    }
+  }
+
+  if (samplesRead == numSamples) {
         // Run inferencing
         TfLiteStatus invokeStatus = tflInterpreter->Invoke();
         if (invokeStatus != kTfLiteOk) {
@@ -150,6 +153,4 @@ void loop() {
 
         Serial.println();
       }
-    }
-  }
 }
