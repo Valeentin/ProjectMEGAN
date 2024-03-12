@@ -1,0 +1,4 @@
+,Attempt,Color,Gesture Detected,Gesture Requested,Success,Reaction Time,Move Time
+0,1,GREEN,TWIST,CROSS,False,1753,2347
+1,2,GREEN,TWIST,RAISE,False,42,122
+2,3,GREEN,TWIST,RAISE,False,130,1047

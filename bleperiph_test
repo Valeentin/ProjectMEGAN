@@ -1,0 +1,69 @@
+from BLEPeripheral import BLEPeripheral
+import struct
+import time
+
+if __name__ == "__main__":
+
+    orange_address = "6664784B-1446-B3F8-C692-BD64944FBFA6"
+    orange_service = "7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"
+    orange_experiment_start = "911172d0-ab12-48f0-8d71-648c6c33bfec"
+    orange_move_complete0 = "09fc7423-502a-4e2e-ba72-7122381f1c4d"
+    orange_move_complete1 = "579d1be1-c066-435c-8f11-76d75e03f319"
+    orange_gesture_complete0 = "deaeaf0a-d25e-4427-a681-5968e7459752"
+    orange_gesture_complete1 = "c3b6591f-3d60-407c-b295-c423ce5e7bc8"
+    orange_gesture = "a294e426-3f67-4421-8cb5-a83267de5b7f"
+
+    gestures = ["TWIST", "RAISE", "CROSS", "FLEX"]
+
+    # Initialize the BLEPeripheral object
+    orange = BLEPeripheral(orange_address)
+
+    orange.connect()
+
+    print("Connection Success!")
+
+    while True:
+    
+        while (input("Press Enter to Start The Trial:") != ''):
+            continue
+
+        orange.write(orange_service, orange_experiment_start, struct.pack('<B', 1))
+
+        val0 = b'\x00'
+
+        while val0 == b'\x00' or val0 == None:
+            # content = input("Enter content to write: ")
+            # if content == 'q':
+            #    break
+            # else:
+            #    orange.write(orange_service, orange_move_complete, content)
+            # # Perform read/write operations using the BLEPeripheral object
+            val0 = orange.read(orange_service, orange_move_complete0)
+            val1 = orange.read(orange_service, orange_move_complete1)
+            val2 = orange.read(orange_service, orange_gesture_complete0)
+            val3 = orange.read(orange_service, orange_gesture_complete1)
+            val4 = orange.read(orange_service, orange_gesture)
+        
+        print(f"Reaction Time: {struct.unpack('<H', val0 + val1)[0]} milliseconds.")
+        print(f"Move Time: {struct.unpack('<H', val2 + val3)[0]} milliseconds.")
+        print(f"Gesture Detected: {gestures[struct.unpack('<B', val4)[0]]}")
+
+        val0 = b'\x00'
+        val1 = b'\x00'
+        val2 = b'\x00'
+        val3 = b'\x00'
+        val4 = b'\x00'
+
+        orange.write(orange_service, orange_experiment_start, struct.pack('<B', 0))
+
+        time.sleep(1)
+
+
+    
+
+    # time.sleep(.1)
+    # found_value = ble_peripheral.read_until_found(b"some_value", timeout=10)
+    # print(f"Found value: {found_value}")
+
+    # Disconnect the peripheral
+    orange.disconnect()
