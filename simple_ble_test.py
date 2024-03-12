@@ -59,6 +59,7 @@ if __name__ == "__main__":
         # Write the content to the characteristic
         # Note: `write_request` required the payload to be presented as a bytes object.
         peripheral.write_request(service_uuid, characteristic_uuid, str.encode(content))
+        print(peripheral.read(service_uuid, characteristic_uuid))
 
 
     print("PROGRAM TERMINATED. DISCONNECTING")

@@ -10,20 +10,24 @@ from GUI import GUI
 
 
 TEST_FORMAT = ["AUDIO", "VISUAL"]  # [Audio, Visual]
-IS_RANDOMIZED = False
+IS_RANDOMIZED = False # Runs raise once. If randomized, STD trial.
 RANDOM_PAUSE_DURATION = 1 # Seconds
+IS_RIGHT_HAND = True # Right hand = Orange, Left hand = Red
 
 
 GESTURES = ["TWIST", "RAISE", "CROSS", "FLEX"]
 
-orange_address = "6664784B-1446-B3F8-C692-BD64944FBFA6"
-orange_service = "7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"
-orange_experiment_start = "911172d0-ab12-48f0-8d71-648c6c33bfec"
-orange_move_complete0 = "09fc7423-502a-4e2e-ba72-7122381f1c4d"
-orange_move_complete1 = "579d1be1-c066-435c-8f11-76d75e03f319"
-orange_gesture_complete0 = "deaeaf0a-d25e-4427-a681-5968e7459752"
-orange_gesture_complete1 = "c3b6591f-3d60-407c-b295-c423ce5e7bc8"
-orange_gesture = "a294e426-3f67-4421-8cb5-a83267de5b7f"
+if IS_RIGHT_HAND:
+    ble_address = "6664784B-1446-B3F8-C692-BD64944FBFA6"
+else:
+    ble_address = "A38E949E-036D-6B99-012E-222FDDE5E825"
+ble_service = "7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"
+ble_experiment_start = "911172d0-ab12-48f0-8d71-648c6c33bfec"
+ble_move_complete0 = "09fc7423-502a-4e2e-ba72-7122381f1c4d"
+ble_move_complete1 = "579d1be1-c066-435c-8f11-76d75e03f319"
+ble_gesture_complete0 = "deaeaf0a-d25e-4427-a681-5968e7459752"
+ble_gesture_complete1 = "c3b6591f-3d60-407c-b295-c423ce5e7bc8"
+ble_gesture = "a294e426-3f67-4421-8cb5-a83267de5b7f"
 
 COLORS = {"GREEN": (0, 128, 0),
         "BLUE": (128, 0, 0),
@@ -31,94 +35,6 @@ COLORS = {"GREEN": (0, 128, 0),
         "ORANGE": (0, 128, 200),
         "BLACK": (0, 0, 0)}
 
-
-
-def connect_peripheral(address, char_id):
-    adapters = simplepyble.Adapter.get_adapters()
-
-    # Choosing an adapter
-    if len(adapters) == 0 or len(adapters) > 1:
-            print("NO ADAPTERS FOUND or MORE THAN 1 ADAPTER FOUND")
-    elif len(adapters) == 1:
-        adapter = adapters[0]
-
-    adapter.scan_for(1000)
-    peripherals = adapter.scan_get_results()
-    if len([p for p in peripherals if p.address() == address]) == 1:
-        peripheral = [p for p in peripherals if p.address() == address][0]
-    else:
-        print(f"Device with address [{address}] not found.")
-
-    peripheral.connect()
-
-    # Check that the SERVICE_UUID and CHARACTERISTIC_UUID are valid
-    services = peripheral.services()
-    for service in services:
-        for characteristic in service.characteristics():
-            if char_id == characteristic.uuid():
-                return (service.uuid(), characteristic.uuid()), peripheral
-
-    print(f"Characteristic [{char_id}] not found. ")
-
-    return None, None
-
-def write_peripheral(address, char_id, value):
-    s_c_pair, peripheral = connect_peripheral(address, char_id)
-
-    # Write the content to the characteristic
-    # Note: `write_request` required the payload to be presented as a bytes object.
-    peripheral.write_request(s_c_pair[0], s_c_pair[1], str.encode(value))
-    peripheral.disconnect()
-
-# Read peripheral.
-def read_peripheral(address, char_id):
-    s_c_pair, peripheral = connect_peripheral(address, char_id)
-    bytes_value = peripheral.read(s_c_pair[0], s_c_pair[1])
-    value = bytes_value.decode()
-    peripheral.disconnect()
-
-def read_until_found(address, char_id, values):
-    s_c_pair, peripheral = connect_peripheral(address, char_id)
-    start_time = time.time()
-    while (time.time() - start_time) < SEARCH_TIMEOUT:
-        bytes_value = peripheral.read(s_c_pair[0], s_c_pair[1])
-        value = bytes_value.decode()
-        if value in values:
-            return value
-        time.sleep(.1)
-        continue
-    return "-1"
-
-
-def reset_test(address, char_id):
-    # Send 0 to signify test reset
-    write_peripheral(address, char_id, "0")
-
-
-def gesture_test(gesture):
-    reset_test(RED_ADDRESS, CHARACTERISTIC_UUID)
-
-    print(f"\n --------- Perform the [{gesture}] gesture. --------- \n")
-
-    # Start timer
-    start_time = time.time()
-
-    # Wait for BLE variable to be updated
-    while True:
-        value = read_until_found(RED_ADDRESS, CHARACTERISTIC_UUID, GESTURES)
-        if value == "1":
-            print(f"[{gesture}] gesture completed successfully!")
-            break
-        elif value == "2":
-            print(f"[{gesture}] gesture not completed properly. Wait for instructions and try again.")
-            break
-        elif value == "-1":
-            print(f"ERROR. Arduino has not updated the gesture variable.")
-        elif time.time() - start_time > MAX_GESTURE_TIME:  # Adjust the timeout as needed
-            print(f"FAILED. [{gesture}] gesture was not completed in the minimum time {MAX_GESTURE_TIME}.")
-            break
-
-        time.sleep(2)
 
 def create_trials():
     color_mapping = ["GREEN", "BLUE", "RED", "ORANGE"]
@@ -132,7 +48,7 @@ def create_trials():
 
 # Connect via BT
 print("Connecting to Arduino...")
-orange = BLEPeripheral(orange_address)
+orange = BLEPeripheral(ble_address)
 orange.connect()
 print("Connection Success!")
 
@@ -152,7 +68,6 @@ for test_type in TEST_FORMAT:
     else:
         raise ValueError(f"Error. Test requested was '{test_type}'. Tests should be either 'AUDIO' or 'VISUAL.'")
 
-    
      # Generate Color Mapping
     if IS_RANDOMIZED:
         color_mapping, trial_set = create_trials()
@@ -190,19 +105,19 @@ for test_type in TEST_FORMAT:
                 main_gui.display_color(COLORS["BLACK"])
                 main_gui.read_audio(f"./audio_samples/{color_string}.mp3")
 
-            orange.write(orange_service, orange_experiment_start, struct.pack('<B', 1))
+            orange.write(ble_service, ble_experiment_start, struct.pack('<B', 1))
             
             # Perform test with BLE.
 
-            val0 = b'\x00'
+            val4 = b'\x00'
 
-            while val0 == b'\x00' or val0 == None:
-                val0 = orange.read(orange_service, orange_move_complete0)
+            while val4 == b'\x00' or val4 == None:
+                val4 = orange.read(ble_service, ble_gesture)
             
-            val1 = orange.read(orange_service, orange_move_complete1)
-            val2 = orange.read(orange_service, orange_gesture_complete0)
-            val3 = orange.read(orange_service, orange_gesture_complete1)
-            val4 = orange.read(orange_service, orange_gesture)
+            val0 = orange.read(ble_service, ble_move_complete0)
+            val1 = orange.read(ble_service, ble_move_complete1)
+            val2 = orange.read(ble_service, ble_gesture_complete0)
+            val3 = orange.read(ble_service, ble_gesture_complete1)
 
             reaction_time = struct.unpack('<H', val0 + val1)[0]
             move_time = struct.unpack('<H', val2 + val3)[0]
@@ -219,7 +134,7 @@ for test_type in TEST_FORMAT:
             val2 = b'\x00'
             val3 = b'\x00'
             val4 = b'\x00'
-            orange.write(orange_service, orange_experiment_start, struct.pack('<B', 0))
+            orange.write(ble_service, ble_experiment_start, struct.pack('<B', 0))
             
             gesture_detected = GESTURES[gesture_index]
             if gesture_index == i:

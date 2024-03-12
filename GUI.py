@@ -80,7 +80,7 @@ class GUI:
                                     " next slide. \n")
 
     def setup_complete(self):
-        self.display_and_read_text("Setup and connection complete. \n Press enter to begin.")
+        self.display_and_read_text("Setup and connection complete. \n Press enter once to begin.")
         cv2.waitKey(0)
 
     def display_color_mapping(self, color_mapping):

@@ -1,2 +1,4 @@
 ,Attempt,Color,Gesture Detected,Gesture Requested,Success,Reaction Time,Move Time
-0,1,BLUE,RAISE,RAISE,True,2171,2189
+0,1,BLUE,RAISE,CROSS,False,627,906
+1,2,BLUE,RAISE,CROSS,False,416,763
+2,3,BLUE,RAISE,CROSS,False,311,815

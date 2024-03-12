@@ -49,8 +49,8 @@ class BLEPeripheral:
             try:
                 return self.peripheral.read(service_uuid, char_uuid)
             except Exception as e:
-                # print("Error reading from peripheral device.")
-                # print(e)
+                #print("Error reading from peripheral device.")
+                #print(e)
                 return None
 
     def write(self, service_uuid, char_uuid, bits):
