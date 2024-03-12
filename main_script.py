@@ -157,24 +157,7 @@ for test_type in TEST_FORMAT:
 
     df = pd.DataFrame(trial_results, columns=["Attempt", "Color", "Gesture Detected", "Gesture Requested", "Success", "Reaction Time", "Move Time"])
 
-    df.to_csv(f'{test_type}.csv')
-
-
-
-# print("Connecting to Arduino...")
-
-# UUIDS_PAIR, peripheral = connect_peripheral(RED_ADDRESS, CHARACTERISTIC_UUID)
-
-# if peripheral is not None:
-#     print("Connection success.")
-#     peripheral.disconnect()
-#     try:
-#         for gesture in GESTURES:
-#             input(f"\nPress Enter to start {gesture} gesture test...")
-#             gesture_test(gesture)
-#     finally:
-#         print("Test Complete")
-
-
-# write_peripheral(RED_ADDRESS, CHARACTERISTIC_UUID, "2")
-# read_peripheral(RED_ADDRESS, CHARACTERISTIC_UUID)
+    if IS_RIGHT_HAND:
+        df.to_csv(f'{test_type}_RIGHT.csv')
+    else:
+        df.to_csv(f'{test_type}_LEFT.csv')
