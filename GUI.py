@@ -56,29 +56,29 @@ class GUI:
         self.read_text(text.replace("\n", ""))
 
     def audio_instructions(self):
-        self.display_and_read_text("Welcome to the MEGAN Protocol's series of \n"
-                                   "auditory coordination tests. Each of the \n"
-                                    "four gestures demonstrated for you will be \n"
-                                    "mapped to a color. For each trial, wait for \n"
-                                    "the computer to announce a color. Then, \n"
-                                    "perform the gesture in one smooth motion. \n"
-                                    "After completing the move, stand still and \n"
-                                    "wait for the computer's instructions. \n"
-                                    "The color mapping is shown on the \n"
-                                    " next slide. \n")
-
+        # self.display_and_read_text("Welcome to the MEGAN Protocol's series of \n"
+        #                            "auditory coordination tests. Each of the \n"
+        #                             "four gestures demonstrated for you will be \n"
+        #                             "mapped to a color. For each trial, wait for \n"
+        #                             "the computer to announce a color. Then, \n"
+        #                             "perform the gesture in one smooth motion. \n"
+        #                             "After completing the move, stand still and \n"
+        #                             "wait for the computer's instructions. \n"
+        #                             "The color mapping is shown on the \n"
+        #                             " next slide. \n")
+        return
     def visual_instructions(self):
-        self.display_and_read_text("Welcome to the MEGAN Protocol's series of \n"
-                                   "visual coordination tests. Each of the \n"
-                                    "four gestures demonstrated for you will be \n"
-                                    "mapped to a color. For each trial, wait for \n"
-                                    "the computer to display a color. Then, \n"
-                                    "perform the gesture in one smooth motion. \n"
-                                    "After completing the move, stand still and \n"
-                                    "wait for the computer's instructions. \n"
-                                    "The color mapping is shown on the \n"
-                                    " next slide. \n")
-
+        # self.display_and_read_text("Welcome to the MEGAN Protocol's series of \n"
+        #                            "visual coordination tests. Each of the \n"
+        #                             "four gestures demonstrated for you will be \n"
+        #                             "mapped to a color. For each trial, wait for \n"
+        #                             "the computer to display a color. Then, \n"
+        #                             "perform the gesture in one smooth motion. \n"
+        #                             "After completing the move, stand still and \n"
+        #                             "wait for the computer's instructions. \n"
+        #                             "The color mapping is shown on the \n"
+        #                             " next slide. \n")
+        return
     def setup_complete(self):
         self.display_and_read_text("Setup and connection complete. \n Press enter once to begin.")
         cv2.waitKey(0)

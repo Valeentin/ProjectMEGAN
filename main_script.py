@@ -10,17 +10,18 @@ from GUI import GUI
 
 
 TEST_FORMAT = ["AUDIO", "VISUAL"]  # [Audio, Visual]
-IS_RANDOMIZED = False # Runs raise once. If randomized, STD trial.
+IS_RANDOMIZED = True # Runs raise once. If randomized, STD trial.
 RANDOM_PAUSE_DURATION = 1 # Seconds
 IS_RIGHT_HAND = True # Right hand = Orange, Left hand = Red
+NUM_ATTEMPTS = 3 # Number of attempts 
 
 
 GESTURES = ["TWIST", "RAISE", "CROSS", "FLEX"]
 
 if IS_RIGHT_HAND:
-    ble_address = "6664784B-1446-B3F8-C692-BD64944FBFA6"
+    ble_address = "318E7A29-D772-6D2C-9396-E1195BD92EFC"
 else:
-    ble_address = "A38E949E-036D-6B99-012E-222FDDE5E825"
+    ble_address = "DECB17FA-3E42-8E27-7972-784A3505419A"
 ble_service = "7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"
 ble_experiment_start = "911172d0-ab12-48f0-8d71-648c6c33bfec"
 ble_move_complete0 = "09fc7423-502a-4e2e-ba72-7122381f1c4d"
@@ -73,15 +74,21 @@ for test_type in TEST_FORMAT:
         color_mapping, trial_set = create_trials()
     else:
         color_mapping = ["GREEN", "BLUE", "RED", "ORANGE"]
-        trial_set = [1] # TWIST, RAISE, CROSS, FLEX
+        trial_set = [0] # TWIST, RAISE, CROSS, FLEX
      
+
+    print(f"COLOR MAPPING: {color_mapping}")
+    print(f"GESTURE MAPPING: {GESTURES}")
+    print(f"TRIAL SET: {trial_set}")
+
+    print("/n")
 
     time.sleep(1.5)
 
     main_gui.display_color_mapping(color_mapping)
     main_gui.display_and_read_text("Beginning testing. Assume your resting position.")
 
-    time.sleep(1.5)
+    time.sleep(1)
 
     trial_results = []
 
@@ -92,26 +99,28 @@ for test_type in TEST_FORMAT:
         gesture = GESTURES[i]
         success = False
 
-        for attempt in range(1, 4):
+        for attempt in range(1, NUM_ATTEMPTS + 1):
+
+
             if (is_visual_test):
                 # TODO: Visual Test Code
                 main_gui.display_and_read_text("Get ready. The visual test will begin in 3. 2. 1.")
                 time.sleep(random.random() * RANDOM_PAUSE_DURATION)
+                orange.write(ble_service, ble_experiment_start, struct.pack('<B', 1))
                 main_gui.display_color(COLORS[color_string])
             else:
                 # TODO: Audio Test Code
                 main_gui.display_and_read_text("Get ready. The audio test will begin in 3. 2. 1.")
                 time.sleep(random.random() * RANDOM_PAUSE_DURATION)
                 main_gui.display_color(COLORS["BLACK"])
+                orange.write(ble_service, ble_experiment_start, struct.pack('<B', 1))
                 main_gui.read_audio(f"./audio_samples/{color_string}.mp3")
-
-            orange.write(ble_service, ble_experiment_start, struct.pack('<B', 1))
             
             # Perform test with BLE.
 
-            val4 = b'\x00'
+            val4 = b'\xff'
 
-            while val4 == b'\x00' or val4 == None:
+            while val4 == b'\xff' or val4 == None:
                 val4 = orange.read(ble_service, ble_gesture)
             
             val0 = orange.read(ble_service, ble_move_complete0)
@@ -139,23 +148,22 @@ for test_type in TEST_FORMAT:
             gesture_detected = GESTURES[gesture_index]
             if gesture_index == i:
                 success = True
+                main_gui.display_and_read_text("TRACKING COMPLETE, CORRECT. \n Please return to resting position.")
             else:
                 success = False
+                main_gui.display_and_read_text("TRACKING COMPLETE, INCORRECT. \n Please return to resting position.")
             
             # print(f"TRIAL RESULT: \n [attmpt, colr, gest, succ, react, move]] \n  {[attempt, color, gesture, gesture_detected, success, reaction_time, move_time]} \n")
             trial_results.append([attempt, color_string, gesture, gesture_detected, success, reaction_time, move_time])
 
-            # TODO: Tracking complete
-            main_gui.display_and_read_text("TRACKING COMPLETE. \n Please return to resting position.")
-
-            time.sleep(3)
+            time.sleep(2)
 
 
             if success:
                 break  # Exit the loop if the user succeeds
 
 
-    df = pd.DataFrame(trial_results, columns=["Attempt", "Color", "Gesture Detected", "Gesture Requested", "Success", "Reaction Time", "Move Time"])
+    df = pd.DataFrame(trial_results, columns=["Attempt", "Color", "Gesture Requested", "Gesture Detected", "Success", "Reaction Time", "Move Time"])
 
     if IS_RIGHT_HAND:
         df.to_csv(f'{test_type}_RIGHT.csv')

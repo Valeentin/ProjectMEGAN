@@ -113,7 +113,7 @@ void bleSetup() {
 void setup() {
   // Setup serial connection.
   Serial.begin(9600);
-  while (!Serial);
+  // while (!Serial);
 
   // -------------------------- BLE SETUP --------------------------
   motionService = new BLEService("7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"); // BLE LED Service

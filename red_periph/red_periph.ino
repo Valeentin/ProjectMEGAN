@@ -68,7 +68,7 @@ void resetChars() {
 void setup() {
   // Setup serial connection.
   Serial.begin(9600);
-  while (!Serial);
+  // while (!Serial);
 
   // -------------------------- BLE SETUP --------------------------
   motionService = new BLEService("7e140f58-cd90-4aa9-b4a5-29b74a7bb3fd"); // BLE LED Service
@@ -306,7 +306,7 @@ void loop() {
       while (central.connected() and !(experimentStart->value() == 0)) {
       // Wait for python script to read values. 
       // Python script writes to experimentStart when done.
-      delay(50)
+      delay(50);
       }
       
       resetChars();
