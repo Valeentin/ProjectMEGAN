@@ -10,10 +10,12 @@ from GUI import GUI
 
 
 TEST_FORMAT = ["AUDIO", "VISUAL"]  # [Audio, Visual]
-IS_RANDOMIZED = True # Runs raise once. If randomized, STD trial.
+IS_RANDOMIZED = False # Runs raise once. If randomized, STD trial.
 RANDOM_PAUSE_DURATION = 1 # Seconds
 IS_RIGHT_HAND = True # Right hand = Orange, Left hand = Red
-NUM_ATTEMPTS = 3 # Number of attempts 
+NUM_ATTEMPTS = 3 # Number of attempts
+
+SUBJECT_NUMBER = int(input("ENTER SUBJECT NUMBER: "))
 
 
 GESTURES = ["TWIST", "RAISE", "CROSS", "FLEX"]
@@ -154,7 +156,7 @@ for test_type in TEST_FORMAT:
                 main_gui.display_and_read_text("TRACKING COMPLETE, INCORRECT. \n Please return to resting position.")
             
             # print(f"TRIAL RESULT: \n [attmpt, colr, gest, succ, react, move]] \n  {[attempt, color, gesture, gesture_detected, success, reaction_time, move_time]} \n")
-            trial_results.append([attempt, color_string, gesture, gesture_detected, success, reaction_time, move_time])
+            trial_results.append([SUBJECT_NUMBER, IS_RIGHT_HAND, is_visual_test, attempt, color_string, gesture, gesture_detected, success, reaction_time, move_time])
 
             time.sleep(2)
 
@@ -163,9 +165,9 @@ for test_type in TEST_FORMAT:
                 break  # Exit the loop if the user succeeds
 
 
-    df = pd.DataFrame(trial_results, columns=["Attempt", "Color", "Gesture Requested", "Gesture Detected", "Success", "Reaction Time", "Move Time"])
+    df = pd.DataFrame(trial_results, columns=["Subject Number", "IS_RIGHT_HAND", "IS_VISUAL_TEST", "Attempt", "Color", "Gesture Requested", "Gesture Detected", "Success", "Reaction Time", "Move Time"])
 
     if IS_RIGHT_HAND:
-        df.to_csv(f'{test_type}_RIGHT.csv')
+        df.to_csv(f'{SUBJECT_NUMBER}_{test_type}_RIGHT.csv')
     else:
-        df.to_csv(f'{test_type}_LEFT.csv')
+        df.to_csv(f'{SUBJECT_NUMBER}_{test_type}_LEFT.csv')
